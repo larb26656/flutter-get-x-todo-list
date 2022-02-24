@@ -27,14 +27,14 @@ class UserCard extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(user.name,
+        Text(user.name ?? '-',
           style: const TextStyle(
               color: ColorPalettes.light
           ),),
         const SizedBox(
           height: Dimensions.spacePadding2,
         ),
-        Text(user.role,
+        Text(user.role ?? '-',
             style: const TextStyle(
                 color: ColorPalettes.light
             )

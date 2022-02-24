@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:todo_list/model/task_dto.dart';
+import 'package:todo_list/model/user_dto.dart';
 import 'package:todo_list/style/color_palettes.dart';
 import 'package:todo_list/style/dimensions.dart';
 import 'package:todo_list/style/text_size.dart';
@@ -69,12 +70,17 @@ class _TaskFormPageState extends State<TaskFormPage> {
         textStyle: const TextStyle(fontSize: TextSize.t5Size),
       ),
       onPressed: isFormValid ? () {
+        UserDto user = UserDto.fromEmpty();
+        user.id = 1;
+
         Navigator.pop(
           context,
           TaskDto(
+            null,
             _topicController.text,
             _descriptionController.text,
-            DateTime.now()
+            DateTime.now(),
+            user
           )
         );
     } : null,

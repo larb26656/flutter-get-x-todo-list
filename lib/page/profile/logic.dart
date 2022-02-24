@@ -8,12 +8,20 @@ class ProfileLogic extends GetxController {
 
   RxBool isLoading = false.obs;
 
+  Rx<dynamic> error = Rx(null);
+
   RxList<TaskDto> taskList = RxList();
 
   searchTask() async {
+    error.value = null;
     taskList.value = [];
     isLoading.value = true;
-    taskList.value = await taskService.getList();
+    try {
+      taskList.value = await taskService.getList() ?? [];
+    } catch (e, st) {
+      error.value = e;
+      print(st);
+    }
     isLoading.value = false;
   }
 

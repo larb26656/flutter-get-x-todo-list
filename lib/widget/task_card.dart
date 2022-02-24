@@ -22,7 +22,7 @@ class TaskCard extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(task.topic,
+            Text(task.topic ??  '-',
               style: const TextStyle(
                   color: ColorPalettes.light
               ),),

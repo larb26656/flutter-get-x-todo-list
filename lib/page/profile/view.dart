@@ -1,3 +1,6 @@
+import 'dart:io';
+
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:get/get.dart';
@@ -6,7 +9,9 @@ import 'package:todo_list/route_management.dart';
 import 'package:todo_list/style/color_palettes.dart';
 import 'package:todo_list/style/dimensions.dart';
 import 'package:todo_list/style/text_size.dart';
+import 'package:todo_list/utils/error_catcher.dart';
 import 'package:todo_list/widget/dashboard_tile.dart';
+import 'package:todo_list/widget/error_retry.dart';
 import 'package:todo_list/widget/task_card.dart';
 import 'package:todo_list/widget/text_indicator_card.dart';
 
@@ -104,6 +109,28 @@ class ProfilePage extends StatelessWidget {
     );
   }
 
+  Widget _error() {
+    return Column(
+      children: [
+        Text("error"),
+        SizedBox(height: Dimensions.spacePadding3,),
+        TextButton(
+          style: TextButton.styleFrom(
+            shape: const RoundedRectangleBorder(borderRadius: BorderRadius.zero),
+            backgroundColor: ColorPalettes.secondary,
+            padding: const EdgeInsets.all(Dimensions.spacePadding3),
+            primary: Colors.white,
+            textStyle: const TextStyle(fontSize: TextSize.t5Size),
+          ),
+          onPressed: () {
+            logic.searchTask();
+          },
+          child: const Text('Retry'),
+        )
+      ],
+    );
+  }
+
   Widget _taskList() {
     return Obx(() {
       if (logic.isLoading.value) {
@@ -113,55 +140,69 @@ class ProfilePage extends StatelessWidget {
         );
       } else {
         return Obx(() {
-          return ListView.separated(
-              separatorBuilder: (BuildContext context, int index) =>
+          if (logic.error.value != null) {
+            dynamic e = logic.error.value;
+            String message = ErrorCatcher.getErrorMessage(e);
+            
+            return ErrorRetry(
+              errorText: message,
+              onRetry: () {
+                logic.searchTask();
+              },
+            );
+          } else {
+            return Obx(() {
+              return ListView.separated(
+                  separatorBuilder: (BuildContext context, int index) =>
                   const SizedBox(
                     height: Dimensions.spacePadding3,
                   ),
-              padding: const EdgeInsets.all(Dimensions.spacePadding3),
-              itemCount: logic.taskList.length,
-              itemBuilder: (BuildContext ctxt, int index) {
-                TaskDto task = logic.taskList[index];
+                  padding: const EdgeInsets.all(Dimensions.spacePadding3),
+                  itemCount: logic.taskList.length,
+                  itemBuilder: (BuildContext ctxt, int index) {
+                    TaskDto task = logic.taskList[index];
 
-                return TaskCard(
-                  onTaskTap: () {
-                    // Navigator.push(
-                    //   context,
-                    //   MaterialPageRoute(
-                    //       builder: (context) => TaskDetailPage(
-                    //         task: task,
-                    //       )),
-                    // ).then((value) {
-                    //   if (value != null) {
-                    //     if (value) {
-                    //       setState(() {
-                    //         taskList.removeAt(index);
-                    //       });
-                    //     }
-                    //   }
-                    //   return value;
-                    // });
-                  },
-                  onDoneTap: () {
-                    // showDialog<bool>(
-                    //     context: context,
-                    //     barrierDismissible: false, // user must tap button!
-                    //     builder: (BuildContext context) {
-                    //       return const DoneTaskDialog();
-                    //     }).then((value) {
-                    //   if (value != null) {
-                    //     if (value) {
-                    //       setState(() {
-                    //         taskList.removeAt(index);
-                    //       });
-                    //     }
-                    //   }
-                    //   return value;
-                    // });
-                  },
-                  task: task,
-                );
-              });
+                    return TaskCard(
+                      onTaskTap: () {
+                        // Navigator.push(
+                        //   context,
+                        //   MaterialPageRoute(
+                        //       builder: (context) => TaskDetailPage(
+                        //         task: task,
+                        //       )),
+                        // ).then((value) {
+                        //   if (value != null) {
+                        //     if (value) {
+                        //       setState(() {
+                        //         taskList.removeAt(index);
+                        //       });
+                        //     }
+                        //   }
+                        //   return value;
+                        // });
+                      },
+                      onDoneTap: () {
+                        // showDialog<bool>(
+                        //     context: context,
+                        //     barrierDismissible: false, // user must tap button!
+                        //     builder: (BuildContext context) {
+                        //       return const DoneTaskDialog();
+                        //     }).then((value) {
+                        //   if (value != null) {
+                        //     if (value) {
+                        //       setState(() {
+                        //         taskList.removeAt(index);
+                        //       });
+                        //     }
+                        //   }
+                        //   return value;
+                        // });
+                      },
+                      task: task,
+                    );
+                  });
+            });
+          }
         });
       }
     });

@@ -1,20 +1,27 @@
 import 'dart:async';
 
+import 'package:dio/dio.dart';
 import 'package:todo_list/model/task_dto.dart';
+import 'package:todo_list/network/todo_list_api_dio.dart';
 
 class TaskService {
-  final List<TaskDto> _taskList = [];
+  Future<List<TaskDto>?> getList() async {
+    List<TaskDto>? dataList;
 
-  Future<List<TaskDto>> getList() async {
-    // TODO call api
-    await Future.delayed(const Duration(seconds: 1), (){});
-    return Future.value(_taskList);
+    Response<List<dynamic>> res = await TodoListApi.getApiDio().get<List<dynamic>>('/api/task/user/1');
+
+    if (res.data != null) {
+      final body = res.data as List;
+      dataList = body.map((e) => TaskDto.fromJson(e)).toList();
+    }
+
+    return dataList;
   }
 
   Future<void> add(TaskDto task) async {
-    // TODO call api
-    await Future.delayed(const Duration(seconds: 1), (){});
-    _taskList.add(task);
+    await TodoListApi.getApiDio().post('/api/task',
+        data: task
+    );
   }
 
 }

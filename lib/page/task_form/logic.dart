@@ -1,6 +1,7 @@
 import 'package:get/get.dart';
 import 'package:reactive_forms/reactive_forms.dart';
 import 'package:todo_list/model/task_dto.dart';
+import 'package:todo_list/model/user_dto.dart';
 import 'package:todo_list/service/task/task_service.dart';
 
 class TaskFormLogic extends GetxController {
@@ -16,11 +17,17 @@ class TaskFormLogic extends GetxController {
 
   Future<void> submit() async {
     isLoading.value = true;
+
+    UserDto user = UserDto.fromEmpty();
+    user.id = 1;
+
     await taskService.add(
         TaskDto(
+          null,
           form.control('topic').value,
           form.control('description').value,
-          DateTime.now()
+          DateTime.now(),
+          user
         )
     );
     isLoading.value = false;
